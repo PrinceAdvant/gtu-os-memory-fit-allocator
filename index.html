@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GTU OS 3140702 memory allocation: First Fit, Best Fit and Worst Fit, plus external fragmentation</title>
+<meta name="description" content="GTU Hero&#x27;s OS guide puts Memory Management as Unit 6, 15% of 3140702, and notes that internal vs external fragmentation repeated as theory in W2022 Q4">
+<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.5}input,textarea,select{margin:.3rem 0;padding:.3rem;width:min(100%,360px);box-sizing:border-box}textarea{width:min(100%,520px);min-height:6rem;font-family:ui-monospace,monospace}#out{font-weight:bold;margin-top:1rem;white-space:pre-wrap;font-family:ui-monospace,monospace}</style></head><body>
+<h1>GTU OS 3140702 memory allocation: First Fit, Best Fit and Worst Fit, plus external fragmentation</h1>
+<p>GTU Hero&#x27;s OS guide puts Memory Management as Unit 6, 15% of 3140702, and notes that internal vs external fragmentation repeated as theory in W2022 Q4(b) and W2024 Q3(b). It also flags that W2024 Q4&#x27;s OR swapped from scheduling to memory allocation, so this numerical is worth practising. Hole sizes aur process sizes daalo: this page places each process by First Fit, Best Fit or Worst Fit (variable partitions) and tells you if a failed allocation is external fragmentation. Practice values are my own, not from a GTU paper.</p>
+<h2>Tool</h2>
+<label>Hole / block sizes, in address order<br><input id="blocks" value="100 500 200 300 600"></label><br>
+<label>Process sizes, in arrival order<br><input id="procs" value="212 417 112 426"></label><br>
+<label>Algorithm<br><select id="algo"><option value="first">first (First Fit)</option><option value="best">best (Best Fit)</option><option value="worst">worst (Worst Fit)</option></select></label><br>
+<button type="button" onclick="go()">Show</button>
+<div id="out"></div>
+<h2>Facts used</h2>
+<ul><li>First Fit: scan holes from the start of memory and take the first hole that is large enough.</li><li>Best Fit: take the smallest hole that is large enough. Worst Fit: take the largest hole.</li><li>This tool uses variable (dynamic) partitions: a leftover piece of a hole stays as a new hole. That leftover is not internal fragmentation.</li><li>Internal fragmentation is leftover space inside a fixed partition that no other process can use. External fragmentation is when free space exists in total, but it is split so no hole is large enough.</li><li>Default practice set: holes 100, 500, 200, 300, 600 and processes 212, 417, 112, 426. First Fit and Worst Fit cannot place 426 (external fragmentation). Best Fit places all four.</li></ul>
+<h2>Galti mat karna</h2>
+<ul><li>Say which placement rule you used, and show the hole list after every allocation, not only the last total.</li><li>If a process cannot be placed, add up the remaining holes. If the sum is large enough, write &#x27;external fragmentation&#x27;.</li><li>Do not mix this numerical with page replacement (FIFO, LRU, Optimal). That is a different Unit 6 question, with frames and a reference string.</li><li>Compaction is one way to fix external fragmentation. Fixed partitions trade that for internal fragmentation.</li></ul>
+<p>Repeat table, unit weights and the 7-day OS plan: <a href="https://gtuhero.com/blogs/gtu-os-paper-operating-system-pyq">GTU Hero</a> (GTU Hero is my project).</p>
+<script src="calc.js"></script>
+<script>
+function go(){
+let out;
+  try {
+    const blocks = F.parseList(document.getElementById('blocks').value, 'Blocks');
+    const procs = F.parseList(document.getElementById('procs').value, 'Processes');
+    const algo = document.getElementById('algo').value;
+    const r = F.allocate(blocks, procs, algo);
+    out = F.format(r, blocks, procs);
+  } catch (e) { out = 'Check your input: ' + e.message; }
+  document.getElementById('out').textContent = out;
+}
+go();
+</script>
+</body></html>
